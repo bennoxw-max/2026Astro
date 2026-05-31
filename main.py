@@ -4,6 +4,7 @@ import runloop
 import color
 import motor_pair
 import color_sensor
+import distance_sensor
 
 motor_pair.pair(motor_pair.PAIR_1, port.D, port.C)
 
@@ -19,7 +20,7 @@ async def left_green_turn():
     while (right_ref > 40):
         right_ref = color_sensor.reflection(port.A)
         motor_pair.move(motor_pair.PAIR_1, -100, velocity=280)
-    
+
     # realign with the line
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 40, 100, velocity=280)
 
@@ -45,6 +46,9 @@ async def right_green_turn():
     # go forward
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, 0, velocity=280)
 
+async def bottle():
+    print("undefined")
+
 async def main():
     while True:
         # fetch colour and reflection from the left and right colour sensors - port A and B
@@ -52,20 +56,29 @@ async def main():
         right_ref = color_sensor.reflection(port.A)
         left_col = color_sensor.color(port.B)
         right_col = color_sensor.color(port.A)
+        left_rr = color_sensor.rgbi(port.A)[0]
+        right_rr = color_sensor.rgbi(port.B)[0]
+        ultrasonic_dist = distance_sensor.distance(port.E)
 
         # line following
         error = round((left_ref - right_ref) * 1.2 + 5)
         motor_pair.move(motor_pair.PAIR_1, error, velocity = 350)
 
-        # check for and do green turns
+        if ((left_rr > 750) and (right_rr > 750)):
+            await motor_pair.move_for_degrees(motor_pair.PAIR_1, 90, 0, velocity=280)
 
-        # left green turn
-        if ((left_col is color.GREEN) and (right_col is not color.GREEN)):
-            runloop.run(left_green_turn())
-        
-        # right green turn
-        if ((left_col is not color.GREEN) and (right_col is color.GREEN)):
-            runloop.run(right_green_turn())
+        # check for green
+        if ((left_col is color.GREEN) or (right_col is color.GREEN)):
+            # left green turn
+            if ((left_col is color.GREEN) and (right_col is not color.GREEN)):
+                runloop.run(left_green_turn())
+
+            # right green turn
+            if ((left_col is not color.GREEN) and (right_col is color.GREEN)):
+                runloop.run(right_green_turn())
+
+        if (ultrasonic_dist < 60):
+            runloop.run(bottle())
 
 
 
