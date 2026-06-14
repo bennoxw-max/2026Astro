@@ -1,5 +1,6 @@
 from hub import light_matrix
 from hub import port
+from hub import motion_sensor
 import runloop
 import color
 import motor_pair
@@ -7,6 +8,21 @@ import color_sensor
 import distance_sensor
 
 motor_pair.pair(motor_pair.PAIR_1, port.D, port.C)
+
+async def turn_to_yaw(target_yaw, speed):
+    print("working")
+
+    motion_sensor.reset_yaw(0)
+    yaw = motion_sensor.tilt_angles()[0]
+
+    if yaw < target_yaw:
+        while (yaw < (target_yaw - (speed / 5))) and (yaw > (target_yaw + (speed / 5))):
+            motor_pair.move_tank(motor_pair.PAIR_1, speed, -speed)
+            yaw = motion_sensor.tilt_angles()[0]
+    else:
+        while (yaw < (target_yaw - (speed / 5))) and (yaw > (target_yaw + (speed / 5))):
+            motor_pair.move_tank(motor_pair.PAIR_1, -speed, speed)
+            yaw = motion_sensor.tilt_angles()[0]
 
 async def left_green_turn():
     # go forward
@@ -60,9 +76,14 @@ async def bottle():
         motor_pair.move(motor_pair.PAIR_1, -40, velocity=300)
         right_col = color_sensor.color(port.A)
 
-    break
+    # go forward
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 200, 0, velocity=280)
+
     
+
 async def main():
+    runloop.run(turn_to_yaw(90, 30))
+
     while True:
         # fetch colour and reflection from the left and right colour sensors - port A and B
         left_ref = color_sensor.reflection(port.B)
@@ -89,10 +110,9 @@ async def main():
             # right green turn
             if ((left_col is not color.GREEN) and (right_col is color.GREEN)):
                 runloop.run(right_green_turn())
- 
+
         if ((ultrasonic_dist < 50) and (ultrasonic_dist > -1)):
             runloop.run(bottle())
-
 
 
 
