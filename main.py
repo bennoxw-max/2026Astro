@@ -6,23 +6,31 @@ import color
 import motor_pair
 import color_sensor
 import distance_sensor
+import math
 
 motor_pair.pair(motor_pair.PAIR_1, port.D, port.C)
 
 async def turn_to_yaw(target_yaw, speed):
-    print("working")
+    print("FUNC: TURN_TO_YAW()")
+    yaw = motion_sensor.tilt_angles()[0]/10
+    aim = -target_yaw
 
-    motion_sensor.reset_yaw(0)
-    yaw = motion_sensor.tilt_angles()[0]
+    print("yaw: ", yaw, " target_yaw: ", aim)
 
-    if yaw < target_yaw:
-        while (yaw < (target_yaw - (speed / 5))) and (yaw > (target_yaw + (speed / 5))):
-            motor_pair.move_tank(motor_pair.PAIR_1, speed, -speed)
-            yaw = motion_sensor.tilt_angles()[0]
-    else:
-        while (yaw < (target_yaw - (speed / 5))) and (yaw > (target_yaw + (speed / 5))):
+    if yaw < aim:
+        while (yaw < (aim - 3)) or (yaw > (aim + 3)):
             motor_pair.move_tank(motor_pair.PAIR_1, -speed, speed)
-            yaw = motion_sensor.tilt_angles()[0]
+            yaw = motion_sensor.tilt_angles()[0]/10
+
+
+        motor_pair.stop(motor_pair.PAIR_1)
+    else:
+        while (yaw < (aim - 3)) or (yaw > (aim + 3)):
+            motor_pair.move_tank(motor_pair.PAIR_1, speed, -speed)
+            yaw = motion_sensor.tilt_angles()[0]/10
+
+
+        motor_pair.stop(motor_pair.PAIR_1)
 
 async def left_green_turn():
     # go forward
@@ -82,7 +90,12 @@ async def bottle():
     
 
 async def main():
-    runloop.run(turn_to_yaw(90, 30))
+
+    motion_sensor.reset_yaw(0)
+
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, -100, velocity=280)
+
+    runloop.run(turn_to_yaw(90, 300))
 
     while True:
         # fetch colour and reflection from the left and right colour sensors - port A and B
@@ -113,6 +126,7 @@ async def main():
 
         if ((ultrasonic_dist < 50) and (ultrasonic_dist > -1)):
             runloop.run(bottle())
+
 
 
 
