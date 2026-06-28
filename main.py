@@ -71,8 +71,12 @@ async def right_green_turn():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, 0, velocity=280)
 
 async def bottle():
+    print("bottle")
+
+    motion_sensor.reset_yaw(0)
+
     # go backwards
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 200, 0, velocity=-280)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 150, 0, velocity=-280)
 
     # turn right
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 260, 40, velocity=300)
@@ -80,22 +84,20 @@ async def bottle():
     # arc around the bottle
     right_col = color_sensor.color(port.A)
 
-    while (right_col is color.BLACK):
-        motor_pair.move(motor_pair.PAIR_1, -40, velocity=300)
+    while (right_col is color.WHITE):
+        motor_pair.move(motor_pair.PAIR_1, -18, velocity=500)
         right_col = color_sensor.color(port.A)
-
-    # go forward
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 200, 0, velocity=280)
-
     
+    # go forward
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, 0, velocity=280)
+
+    runloop.run(turn_to_yaw(0, 200))
+
+
+
+
 
 async def main():
-
-    motion_sensor.reset_yaw(0)
-
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, -100, velocity=280)
-
-    runloop.run(turn_to_yaw(90, 300))
 
     while True:
         # fetch colour and reflection from the left and right colour sensors - port A and B
