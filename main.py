@@ -31,6 +31,9 @@ async def square_off():
         else:
             motor.run(port.D, 100)
 
+    motor.stop(port.C)
+    motor.stop(port.D)
+
 
 async def turn_to_yaw(target_yaw, speed):
     print("FUNC: TURN_TO_YAW()")
