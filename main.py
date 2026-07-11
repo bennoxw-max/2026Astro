@@ -4,11 +4,33 @@ from hub import motion_sensor
 import runloop
 import color
 import motor_pair
+import motor
 import color_sensor
 import distance_sensor
 import math
+import time
 
 motor_pair.pair(motor_pair.PAIR_1, port.D, port.C)
+
+
+async def square_off():
+    offset = time.ticks_ms()
+    timer = time.ticks_ms() - offset
+
+    while timer < 3000:
+        left_rr = color_sensor.rgbi(port.A)[0]
+        right_rr = color_sensor.rgbi(port.B)[0]
+
+        if left_rr > 500:
+            motor.run(port.C, 200)
+        else:
+            motor.run(port.C, -100)
+
+        if right_rr > 500:
+            motor.run(port.D, -200)
+        else:
+            motor.run(port.D, 100)
+
 
 async def turn_to_yaw(target_yaw, speed):
     print("FUNC: TURN_TO_YAW()")
@@ -64,7 +86,7 @@ async def right_green_turn():
         left_ref = color_sensor.reflection(port.B)
         motor_pair.move(motor_pair.PAIR_1, 100, velocity=280)
 
-    # realign with the line
+    # realign with theline
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 40, -100, velocity=280)
 
     # go forward
@@ -87,7 +109,7 @@ async def bottle():
     while (right_col is color.WHITE):
         motor_pair.move(motor_pair.PAIR_1, -18, velocity=500)
         right_col = color_sensor.color(port.A)
-    
+
     # go forward
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, 0, velocity=280)
 
@@ -98,38 +120,7 @@ async def bottle():
 
 
 async def main():
-
-    while True:
-        # fetch colour and reflection from the left and right colour sensors - port A and B
-        left_ref = color_sensor.reflection(port.B)
-        right_ref = color_sensor.reflection(port.A)
-        left_col = color_sensor.color(port.B)
-        right_col = color_sensor.color(port.A)
-        left_rr = color_sensor.rgbi(port.A)[0]
-        right_rr = color_sensor.rgbi(port.B)[0]
-        ultrasonic_dist = distance_sensor.distance(port.E)
-
-        # line following
-        error = round((left_ref - right_ref) * 1.2 + 5)
-        motor_pair.move(motor_pair.PAIR_1, error, velocity = 350)
-
-        if ((left_rr > 750) and (right_rr > 750)):
-            await motor_pair.move_for_degrees(motor_pair.PAIR_1, 90, 0, velocity=280)
-
-        # check for green
-        if ((left_col is color.GREEN) or (right_col is color.GREEN)):
-            # left green turn
-            if ((left_col is color.GREEN) and (right_col is not color.GREEN)):
-                runloop.run(left_green_turn())
-
-            # right green turn
-            if ((left_col is not color.GREEN) and (right_col is color.GREEN)):
-                runloop.run(right_green_turn())
-
-        if ((ultrasonic_dist < 50) and (ultrasonic_dist > -1)):
-            runloop.run(bottle())
-
-
+    runloop.run(square_off())
 
 
 
