@@ -13,6 +13,31 @@ import time
 motor_pair.pair(motor_pair.PAIR_1, port.D, port.C)
 
 
+async def chemical_spill():
+    runloop.run(square_off())
+
+    motion_sensor.reset_yaw(0)
+    yaw = motion_sensor.tilt_angles()[0]/10
+
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 540, 600, 600)
+    
+    offset = time.ticks_ms()
+    timer = time.ticks_ms() - offset
+
+    ultrasonic_dist = distance_sensor.distance(port.E)
+
+    while ((ultrasonic_dist) > 270 or (ultrasonic_dist) < 0) and ((timer < 11000) or (yaw < -3 or yaw > 3)):
+        motor_pair.move_tank(motor_pair.PAIR_1, 80, -80)
+        # print(ultrasonic_dist)
+        ultrasonic_dist = distance_sensor.distance(port.E)
+        yaw = motion_sensor.tilt_angles()[0]/10
+        timer = time.ticks_ms() - offset
+
+    print("found can")
+    motor_pair.stop(motor_pair.PAIR_1)
+
+
+
 async def square_off():
     offset = time.ticks_ms()
     timer = time.ticks_ms() - offset
@@ -30,6 +55,9 @@ async def square_off():
             motor.run(port.D, -200)
         else:
             motor.run(port.D, 100)
+
+        timer = time.ticks_ms() - offset
+
 
     motor.stop(port.C)
     motor.stop(port.D)
@@ -123,7 +151,37 @@ async def bottle():
 
 
 async def main():
-    runloop.run(square_off())
+    while True:
+        # fetch colour and reflection from the left and right colour sensors - port A and B
+        left_ref = color_sensor.reflection(port.B)
+        right_ref = color_sensor.reflection(port.A)
+        left_col = color_sensor.color(port.B)
+        right_col = color_sensor.color(port.A)
+        left_rr = color_sensor.rgbi(port.A)[0]
+        right_rr = color_sensor.rgbi(port.B)[0]
+        ultrasonic_dist = distance_sensor.distance(port.E)
+
+        # line following
+        error = round((left_ref - right_ref) * 1.2 + 5)
+        motor_pair.move(motor_pair.PAIR_1, error, velocity = 350)
+
+        if ((left_rr > 750) and (right_rr > 750)):
+            await motor_pair.move_for_degrees(motor_pair.PAIR_1, 90, 0, velocity=280)
+
+            runloop.run(chemical_spill())
+
+        # check for green
+        if ((left_col is color.GREEN) or (right_col is color.GREEN)):
+            # left green turn
+            if ((left_col is color.GREEN) and (right_col is not color.GREEN)):
+                runloop.run(left_green_turn())
+
+            # right green turn
+            if ((left_col is not color.GREEN) and (right_col is color.GREEN)):
+                runloop.run(right_green_turn())
+
+        if ((ultrasonic_dist < 50) and (ultrasonic_dist > -1)):
+            runloop.run(bottle())
 
 
 
