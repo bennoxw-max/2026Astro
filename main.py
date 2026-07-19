@@ -36,20 +36,20 @@ async def chemical_spill():
         timer = time.ticks_ms() - offset
     motor_pair.stop(motor_pair.PAIR_1)
 
-    if timer > 6000 and (yaw > -3 and yaw < 3):
+    if timer > 6000 and (yaw > -10 and yaw < 10):
         await motor_pair.move_tank_for_degrees(
             motor_pair.PAIR_1, 540, -600, -600 # Move backwards to sqaure off with the silver tape
         ) # move back to silver tape
         runloop.run(square_off()) # Square off with the silver tape
         await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 150, 600, 600
-        ) # move forward 6 cm
-        motor.run_for_degrees(port.C, 216, velocity=500)
+            motor_pair.PAIR_1, 120, 600, 600 # move forward 6 cm
+        )
+        await motor.run_for_degrees(port.C, 260, 500)
         motor.reset_relative_position(port.C, 0)
 
         ultrasonic_dist = distance_sensor.distance(port.E)
         while ((ultrasonic_dist) > 270 or (ultrasonic_dist) < 0):
-            motor_pair.move(motor_pair.PAIR_1, 18, velocity=300) # Keep on repeating donut action until ultrasonic sees the can
+            motor_pair.move(motor_pair.PAIR_1, 20, velocity=300) # Keep on repeating donut action until ultrasonic sees the can
             ultrasonic_dist = distance_sensor.distance(port.E)
         motor_pair.stop(motor_pair.PAIR_1)
 
@@ -65,14 +65,15 @@ async def chemical_spill():
             right_col = color_sensor.color(port.A)
         motor_pair.stop(motor_pair.PAIR_1)
 
-        while (motor.relative_position(port.C) < 1):
+        # print(motor.relative_position(port.C))
+        while (motor.relative_position(port.C) > 1):
             motor_pair.move(motor_pair.PAIR_1, 0, velocity=-300) # Reverse to the same spot where we found the can (the position where the wheel position was reset)
         motor_pair.stop(motor_pair.PAIR_1)
 
         motor.reset_relative_position(port.C, donut_degree) # Restore degree of the wheel to the position where we found the can so we can reverse the donut action
 
         while (motor.relative_position(port.C) >= -50):
-            motor_pair.move(motor_pair.PAIR_1, 18, velocity=-500)
+            motor_pair.move(motor_pair.PAIR_1, 20, velocity=-500)
         motor_pair.stop(motor_pair.PAIR_1)
 
         runloop.run(turn_to_yaw(0, 300))
@@ -84,10 +85,8 @@ async def chemical_spill():
         )
         runloop.run(turn_to_yaw(-90, 300))
 
-        # REVIEW //////
-
         await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 240, -600, -600
+            motor_pair.PAIR_1, 120, -600, -600
         )
 
         # move forward until either colour sensor detects black
@@ -99,9 +98,9 @@ async def chemical_spill():
             right_col = color_sensor.color(port.A)
         motor_pair.stop(motor_pair.PAIR_1)
 
-        # move forward 3 cm
+        # move forward 2 cm
         await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 90, 300, 300
+            motor_pair.PAIR_1, 60, 300, 300
         )
 
         runloop.run(turn_to_yaw(179, 200))
@@ -156,9 +155,9 @@ async def chemical_spill():
 
         runloop.run(turn_to_yaw(-90, 300))
 
-        # move backwards 8 cm
+        # move backwards
         await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 240, -300, -300
+            motor_pair.PAIR_1, 120, -300, -300
         )
 
         # move forward until either sensor detects black
@@ -170,9 +169,9 @@ async def chemical_spill():
             right_col = color_sensor.color(port.A)
         motor_pair.stop(motor_pair.PAIR_1)
 
-        # move forward 3 cm
+        # move forward 2 cm
         await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 90, 400, 400
+            motor_pair.PAIR_1, 60, 400, 400
         )
 
         runloop.run(turn_to_yaw(179, 200))
