@@ -336,7 +336,7 @@ async def main():
 
         # line following
         error = round((left_ref - right_ref) * 1.2 + 5)
-        motor_pair.move(motor_pair.PAIR_1, error, velocity = 320)
+        motor_pair.move(motor_pair.PAIR_1, error, velocity = 300)
 
         if ((left_rr > 850) and (right_rr > 850)):
             await motor_pair.move_for_degrees(motor_pair.PAIR_1, 90, 0, velocity=280)
