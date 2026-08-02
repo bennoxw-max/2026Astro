@@ -258,9 +258,17 @@ async def left_green_turn():
     )
 
     # go forward
-    await motor_pair.move_for_degrees(
-        motor_pair.PAIR_1, 50, 0, velocity=280
-    )
+    #await motor_pair.move_for_degrees(
+    #    motor_pair.PAIR_1, 50, 0, velocity=280
+    #)
+
+    # go forward until no sensors are detecting green
+    left_col = color_sensor.color(port.B)
+    right_col = color_sensor.color(port.A)
+    while ((left_col is color.GREEN) or (right_col is color.GREEN)):
+        motor_pair.move(
+            motor_pair.PAIR_1, 0, velocity=280
+        )
 
 async def right_green_turn():
     print("FUNC: right_green_turn()")
@@ -289,9 +297,17 @@ async def right_green_turn():
     )
 
     # go forward
-    await motor_pair.move_for_degrees(
-        motor_pair.PAIR_1, 50, 0, velocity=280
-    )
+    #await motor_pair.move_for_degrees(
+    #    motor_pair.PAIR_1, 50, 0, velocity=280
+    #)
+
+    # go forward until no sensors are detecting green
+    left_col = color_sensor.color(port.B)
+    right_col = color_sensor.color(port.A)
+    while ((left_col is color.GREEN) or (right_col is color.GREEN)):
+        motor_pair.move(
+            motor_pair.PAIR_1, 0, velocity=280
+        )
 
 async def bottle():
     print("FUNC: bottle()")
