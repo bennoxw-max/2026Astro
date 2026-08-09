@@ -309,9 +309,9 @@ async def right_green_turn():
             motor_pair.PAIR_1, 0, velocity=280
         )
 
-async def adjust_linefollowing_speed():
-    pitch = motion_sensor.tilt_angles()[1]/10
-    lfs = 300 + pitch * 0.6
+def adjust_linefollowing_speed():
+    pitch = motion_sensor.tilt_angles()[1]
+    lfs = int(300 + pitch * 0.25)
     return lfs
 
 async def bottle():
@@ -360,7 +360,7 @@ async def main():
         # line following
         error = round((left_ref - right_ref) * 1.2 + 5)
         lfs = adjust_linefollowing_speed()
-        print(lfs)
+
         motor_pair.move(motor_pair.PAIR_1, error, velocity = lfs)
 
         if ((left_rr > 850) and (right_rr > 850)):
