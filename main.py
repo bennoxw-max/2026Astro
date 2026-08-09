@@ -311,7 +311,7 @@ async def right_green_turn():
 
 def adjust_linefollowing_speed():
     pitch = motion_sensor.tilt_angles()[1]
-    lfs = int(300 + pitch * 0.25)
+    lfs = int(300 + pitch * 0.40)
     return lfs
 
 async def bottle():
@@ -365,8 +365,10 @@ async def main():
 
         if ((left_rr > 850) and (right_rr > 850)):
             await motor_pair.move_for_degrees(motor_pair.PAIR_1, 90, 0, velocity=280)
-
-            runloop.run(chemical_spill())
+            left_col = color_sensor.color(port.B)
+            right_col = color_sensor.color(port.A)
+            if (left_col is color.GREEN) and (right_col is color.GREEN):
+                runloop.run(chemical_spill())
 
         # check for green
         if ((left_col is color.GREEN) or (right_col is color.GREEN)):
