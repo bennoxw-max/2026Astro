@@ -312,6 +312,7 @@ async def right_green_turn():
 async def adjust_linefollowing_speed():
     pitch = motion_sensor.tilt_angles()[1]/10
     lfs = 300 + pitch * 0.6
+    return lfs
 
 async def bottle():
     print("FUNC: bottle()")
@@ -353,13 +354,12 @@ async def main():
         left_rr = color_sensor.rgbi(port.A)[0]
         right_rr = color_sensor.rgbi(port.B)[0]
         ultrasonic_dist = distance_sensor.distance(port.E)
-        global lfs
-        lfs = 300
 
-        runloop.run(adjust_linefollowing_speed())
+        # runloop.run(adjust_linefollowing_speed())
 
         # line following
         error = round((left_ref - right_ref) * 1.2 + 5)
+        lfs = adjust_linefollowing_speed()
         print(lfs)
         motor_pair.move(motor_pair.PAIR_1, error, velocity = lfs)
 
