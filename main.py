@@ -98,11 +98,8 @@ async def chemical_spill():
             right_col = color_sensor.color(port.A)
         motor_pair.stop(motor_pair.PAIR_1)
 
-        # move forward 2 cm
-        await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 60, 300, 300
-        )
-
+        # We are already at the return line; turn directly instead of
+        # overshooting it before the final reverse.
         runloop.run(turn_to_yaw(179, 200))
 
         # move backwards 3 cm
@@ -169,11 +166,8 @@ async def chemical_spill():
             right_col = color_sensor.color(port.A)
         motor_pair.stop(motor_pair.PAIR_1)
 
-        # move forward 2 cm
-        await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 60, 400, 400
-        )
-
+        # We are already at the return line; turn directly instead of
+        # overshooting it before the final reverse.
         runloop.run(turn_to_yaw(179, 200))
 
         # move backwards 3 cm
