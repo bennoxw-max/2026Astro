@@ -266,9 +266,13 @@ async def left_green_turn():
     left_col = color_sensor.color(port.B)
     right_col = color_sensor.color(port.A)
     while ((left_col is color.GREEN) or (right_col is color.GREEN)):
+        left_col = color_sensor.color(port.B)
+        right_col = color_sensor.color(port.A)
         motor_pair.move(
             motor_pair.PAIR_1, 0, velocity=280
         )
+    motor_pair.stop(motor_pair.PAIR_1)
+    print("stopped left green turn and started line following")
 
 async def right_green_turn():
     print("FUNC: right_green_turn()")
@@ -305,9 +309,13 @@ async def right_green_turn():
     left_col = color_sensor.color(port.B)
     right_col = color_sensor.color(port.A)
     while ((left_col is color.GREEN) or (right_col is color.GREEN)):
+        left_col = color_sensor.color(port.B)
+        right_col = color_sensor.color(port.A)
         motor_pair.move(
             motor_pair.PAIR_1, 0, velocity=280
         )
+    motor_pair.stop(motor_pair.PAIR_1)
+    print("stopped right green turn and started line following")
 
 def adjust_linefollowing_speed():
     pitch = motion_sensor.tilt_angles()[1]
