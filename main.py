@@ -341,7 +341,7 @@ async def bottle():
     right_col = color_sensor.color(port.A)
 
     while (right_col is color.WHITE):
-        motor_pair.move(motor_pair.PAIR_1, -18, velocity=500)
+        motor_pair.move(motor_pair.PAIR_1, -20, velocity=500)
         right_col = color_sensor.color(port.A)
 
     # go forward
