@@ -41,6 +41,10 @@ async def chemical_spill():
             motor_pair.PAIR_1, 540, -600, -600 # Move backwards to sqaure off with the silver tape
         ) # move back to silver tape
         runloop.run(square_off()) # Square off with the silver tape
+        yaw = motion_sensor.tilt_angles()[0]/10
+        if yaw < -20 or yaw > 20:
+            runloop.run(turn_to_yaw(0, 200))
+
         await motor_pair.move_tank_for_degrees(
             motor_pair.PAIR_1, 120, 600, 600 # move forward 6 cm
         )
@@ -147,39 +151,6 @@ async def chemical_spill():
 
         runloop.run(square_off())
         runloop.run(turn_to_yaw(179, 200))
-
-        # move forward 4 cm
-        await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 120, 300, 300
-        )
-
-        runloop.run(turn_to_yaw(-90, 300))
-
-        # move backwards
-        await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 120, -300, -300
-        )
-
-        # move forward until either sensor detects black
-        left_col = color_sensor.color(port.B)
-        right_col = color_sensor.color(port.A)
-        while (left_col is not color.BLACK) and (right_col is not color.BLACK):
-            motor_pair.move(motor_pair.PAIR_1, 0, velocity=300)
-            left_col = color_sensor.color(port.B)
-            right_col = color_sensor.color(port.A)
-        motor_pair.stop(motor_pair.PAIR_1)
-
-        # move forward 2 cm
-        await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 60, 400, 400
-        )
-
-        runloop.run(turn_to_yaw(179, 200))
-
-        # move backwards 3 cm
-        await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 90, -300, -300
-        )
 
 
 async def square_off():
