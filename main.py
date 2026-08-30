@@ -114,6 +114,8 @@ async def chemical_spill():
             motor_pair.PAIR_1, 90, -600, -600
         )
 
+        
+
     else:
         # motor_pair.stop(motor_pair.PAIR_1)
         motor.reset_relative_position(port.C, 0) # Reset the relative position
@@ -266,7 +268,7 @@ async def right_green_turn():
             motor_pair.PAIR_1, 100, velocity=280
         )
 
-    # realign with theline
+    # realign with the line
     await motor_pair.move_for_degrees(
         motor_pair.PAIR_1, 40, -100, velocity=280
     )
