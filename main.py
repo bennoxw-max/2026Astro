@@ -76,16 +76,16 @@ async def chemical_spill():
 
         motor.reset_relative_position(port.C, donut_degree) # Restore degree of the wheel to the position where we found the can so we can reverse the donut action
 
-        while (motor.relative_position(port.C) >= -5):
+        while (motor.relative_position(port.C) > -5):
             motor_pair.move(motor_pair.PAIR_1, 20, velocity=-500)
         motor_pair.stop(motor_pair.PAIR_1)
 
         runloop.run(turn_to_yaw(0, 300))
         runloop.run(square_off())
-        runloop.run(turn_to_yaw(179, 200))
+        # runloop.run(turn_to_yaw(179, 200))
 
         await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 80, 400, 400
+            motor_pair.PAIR_1, -80, 400, 400
         )
         runloop.run(turn_to_yaw(-90, 300))
 
@@ -104,7 +104,7 @@ async def chemical_spill():
 
         # move forward 2 cm
         await motor_pair.move_tank_for_degrees(
-            motor_pair.PAIR_1, 60, 300, 300
+            motor_pair.PAIR_1, 45, 300, 300
         )
 
         runloop.run(turn_to_yaw(179, 200))
@@ -113,8 +113,9 @@ async def chemical_spill():
         await motor_pair.move_tank_for_degrees(
             motor_pair.PAIR_1, 90, -600, -600
         )
+        runloop.run(square_off())
 
-        
+
 
     else:
         # motor_pair.stop(motor_pair.PAIR_1)
