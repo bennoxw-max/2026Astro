@@ -76,7 +76,7 @@ async def chemical_spill():
 
         motor.reset_relative_position(port.C, donut_degree) # Restore degree of the wheel to the position where we found the can so we can reverse the donut action
 
-        while (motor.relative_position(port.C) >= -50):
+        while (motor.relative_position(port.C) >= -5):
             motor_pair.move(motor_pair.PAIR_1, 20, velocity=-500)
         motor_pair.stop(motor_pair.PAIR_1)
 
