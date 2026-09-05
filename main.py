@@ -17,7 +17,7 @@ motor_pair.pair(motor_pair.PAIR_1, port.D, port.C)
 async def chemical_spill():
     print("FUNC: chemical_spill()")
     runloop.run(square_off())
-
+#squaring off 
     motion_sensor.reset_yaw(0)
     yaw = motion_sensor.tilt_angles()[0]/10
 
@@ -37,6 +37,7 @@ async def chemical_spill():
     motor_pair.stop(motor_pair.PAIR_1)
 
     if timer > 6000 and (yaw > -10 and yaw < 10):
+        runloop.run(turn_to_yaw(0, 100))
         await motor_pair.move_tank_for_degrees(
             motor_pair.PAIR_1, 540, -600, -600 # Move backwards to sqaure off with the silver tape
         ) # move back to silver tape
@@ -48,7 +49,7 @@ async def chemical_spill():
         await motor_pair.move_tank_for_degrees(
             motor_pair.PAIR_1, 120, 600, 600 # move forward 6 cm
         )
-        await motor.run_for_degrees(port.C, 260, 500)
+        await motor.run_for_degrees(port.C, 270, 500)
         motor.reset_relative_position(port.C, 0)
 
         ultrasonic_dist = distance_sensor.distance(port.E)
@@ -141,7 +142,7 @@ async def chemical_spill():
         #    motor_pair.move_tank(motor_pair.PAIR_1, 150, -150)
         #    yaw = motion_sensor.tilt_angles()[0] / 10
         #motor_pair.stop(motor_pair.PAIR_1)
-        runloop.run(turn_to_yaw(0, 200))
+        runloop.run(turn_to_yaw(0, 100))
 
         # reverse until either colour sensor's raw red value exceeds 500
         left_rr = color_sensor.rgbi(port.B)[0]
@@ -274,7 +275,6 @@ async def right_green_turn():
         motor_pair.PAIR_1, 40, -100, velocity=280
     )
 
-    # go forward
     #await motor_pair.move_for_degrees(
     #    motor_pair.PAIR_1, 50, 0, velocity=280
     #)
